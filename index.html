@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flipcoin</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    margin-top: 60px;
+    background-color: #f5f5f5;
+}
+
+#coin {
+    font-size: 100px;
+    margin: 30px;
+    display: inline-block;
+}
+
+.flip {
+    animation: flipCoin 0.8s ease;
+}
+
+@keyframes flipCoin {
+    0% { transform: rotateY(0deg); }
+    100% { transform: rotateY(1080deg); }
+}
+
+button {
+    padding: 12px 25px;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+input {
+    padding: 10px;
+    font-size: 16px;
+    margin-bottom: 15px;
+}
+
+#result {
+    font-size: 28px;
+    margin-top: 20px;
+}
+</style>
+
+</head>
+<body>
+
+<h1>Flipcoin</h1>
+
+<input id="username" placeholder="Benutzername">
+
+<br><br>
+
+<button onclick="saveName()">Namen speichern</button>
+
+<h3 id="welcome"></h3>
+
+<div id="counter">Anzahl der Flips: 0</div>
+<div id="highscore">Highscore: 0</div>
+
+<div id="coin">🪙</div>
+
+<br>
+
+<button onclick="flipCoin()">Münze werfen</button>
+
+<div id="result"></div>
+
+<script>
+
+let flips = parseInt(localStorage.getItem("flips")) || 0;
+let highscore = parseInt(localStorage.getItem("highscore")) || 0;
+let username = localStorage.getItem("username") || "";
+
+document.getElementById("username").value = username;
+
+if(username){
+    document.getElementById("welcome").textContent =
+        "Willkommen " + username + "!";
+}
+
+function saveName(){
+    username = document.getElementById("username").value.trim();
+
+    if(username){
+        localStorage.setItem("username", username);
+
+        document.getElementById("welcome").textContent =
+            "Willkommen " + username + "!";
+    }
+}
+
+function updateCoin(){
+    const coin = document.getElementById("coin");
+
+    if(flips >= 10000){
+        coin.textContent = "🌈";
+    }
+    else if(flips >= 1000){
+        coin.textContent = "💎";
+    }
+    else if(flips >= 100){
+        coin.textContent = "🥇";
+    }
+    else{
+        coin.textContent = "🪙";
+    }
+}
+
+function updateStats(){
+    document.getElementById("counter").textContent =
+        "Anzahl der Flips: " + flips;
+
+    document.getElementById("highscore").textContent =
+        "Highscore: " + highscore;
+}
+
+updateCoin();
+updateStats();
+
+function flipCoin(){
+
+    flips++;
+
+    if(flips > highscore){
+        highscore = flips;
+        localStorage.setItem("highscore", highscore);
+    }
+
+    localStorage.setItem("flips", flips);
+
+    updateCoin();
+    updateStats();
+
+    const coin = document.getElementById("coin");
+
+    coin.classList.remove("flip");
+    void coin.offsetWidth;
+    coin.classList.add("flip");
+
+    const result =
+        Math.random() < 0.5 ? "Kopf" : "Zahl";
+
+    setTimeout(() => {
+        document.getElementById("result").textContent =
+            "Ergebnis: " + result;
+    }, 400);
+}
+
+</script>
+
+</body>
+</html>
