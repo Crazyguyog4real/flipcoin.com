@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="de">
 <head>
 <meta charset="UTF-8">
@@ -7,61 +6,65 @@
 <title>Flipcoin</title>
 
 <style>
-body {
+body{
     font-family: Arial, sans-serif;
-    text-align: center;
-    margin-top: 60px;
-    background-color: #f5f5f5;
+    text-align:center;
+    margin-top:40px;
+    background:#f5f5f5;
 }
 
-#coin {
-    font-size: 100px;
-    margin: 30px;
-    display: inline-block;
+#coin{
+    font-size:120px;
+    margin:30px;
+    display:inline-block;
 }
 
-.flip {
-    animation: flipCoin 0.8s ease;
+.flip{
+    animation:flipCoin .8s ease;
 }
 
-@keyframes flipCoin {
-    0% { transform: rotateY(0deg); }
-    100% { transform: rotateY(1080deg); }
+@keyframes flipCoin{
+    0%{transform:rotateY(0deg);}
+    100%{transform:rotateY(1080deg);}
 }
 
-button {
-    padding: 12px 25px;
-    font-size: 18px;
-    cursor: pointer;
+button{
+    padding:12px 20px;
+    font-size:16px;
+    margin:5px;
+    cursor:pointer;
 }
 
-input {
-    padding: 10px;
-    font-size: 16px;
-    margin-bottom: 15px;
+input{
+    padding:10px;
+    font-size:16px;
 }
 
-#result {
-    font-size: 28px;
-    margin-top: 20px;
+#result{
+    margin-top:20px;
+    font-size:24px;
+}
+
+.shop{
+    margin-top:30px;
+    padding:15px;
+    background:white;
+    display:inline-block;
+    border-radius:10px;
 }
 </style>
-
 </head>
 <body>
 
-<h1>Flipcoin</h1>
+<h1>🪙 Flipcoin</h1>
 
 <input id="username" placeholder="Benutzername">
-
-<br><br>
-
-<button onclick="saveName()">Namen speichern</button>
+<button onclick="saveName()">Speichern</button>
 
 <h3 id="welcome"></h3>
 
-<div id="counter">Anzahl der Flips: 0</div>
-<div id="highscore">Highscore: 0</div>
+<h2 id="counter">Flips: 0</h2>
+<h3 id="highscore">Highscore: 0</h3>
 
 <div id="coin">🪙</div>
 
@@ -71,32 +74,58 @@ input {
 
 <div id="result"></div>
 
+<div class="shop">
+<h2>🛒 Shop</h2>
+
+<button id="buyX2" onclick="buyX2()">
+x2 Multiplikator (1000 Flips)
+</button>
+
+<br>
+
+<button id="buyX5" onclick="buyX5()">
+x5 Multiplikator (10000 Flips)
+</button>
+
+</div>
+
 <script>
 
 let flips = parseInt(localStorage.getItem("flips")) || 0;
 let highscore = parseInt(localStorage.getItem("highscore")) || 0;
+
 let username = localStorage.getItem("username") || "";
+
+let multiplier = parseInt(localStorage.getItem("multiplier")) || 1;
+
+let hasX2 = localStorage.getItem("hasX2") === "true";
+let hasX5 = localStorage.getItem("hasX5") === "true";
 
 document.getElementById("username").value = username;
 
 if(username){
     document.getElementById("welcome").textContent =
-        "Willkommen " + username + "!";
+    "Willkommen " + username + "!";
 }
 
 function saveName(){
-    username = document.getElementById("username").value.trim();
+
+    username =
+    document.getElementById("username").value.trim();
 
     if(username){
+
         localStorage.setItem("username", username);
 
         document.getElementById("welcome").textContent =
-            "Willkommen " + username + "!";
+        "Willkommen " + username + "!";
     }
 }
 
 function updateCoin(){
-    const coin = document.getElementById("coin");
+
+    const coin =
+    document.getElementById("coin");
 
     if(flips >= 10000){
         coin.textContent = "🌈";
@@ -113,44 +142,118 @@ function updateCoin(){
 }
 
 function updateStats(){
+
     document.getElementById("counter").textContent =
-        "Anzahl der Flips: " + flips;
+    "Flips: " + flips;
 
     document.getElementById("highscore").textContent =
-        "Highscore: " + highscore;
+    "Highscore: " + highscore;
+
+    if(hasX2){
+        document.getElementById("buyX2").disabled = true;
+        document.getElementById("buyX2").textContent =
+        "✓ x2 gekauft";
+    }
+
+    if(hasX5){
+        document.getElementById("buyX5").disabled = true;
+        document.getElementById("buyX5").textContent =
+        "✓ x5 gekauft";
+    }
 }
 
-updateCoin();
-updateStats();
+function buyX2(){
+
+    if(hasX2) return;
+
+    if(flips >= 1000){
+
+        flips -= 1000;
+
+        multiplier *= 2;
+
+        hasX2 = true;
+
+        localStorage.setItem("hasX2", true);
+        localStorage.setItem("multiplier", multiplier);
+        localStorage.setItem("flips", flips);
+
+        updateStats();
+    }
+    else{
+        alert("Du brauchst 1000 Flips!");
+    }
+}
+
+function buyX5(){
+
+    if(hasX5) return;
+
+    if(flips >= 10000){
+
+        flips -= 10000;
+
+        multiplier *= 5;
+
+        hasX5 = true;
+
+        localStorage.setItem("hasX5", true);
+        localStorage.setItem("multiplier", multiplier);
+        localStorage.setItem("flips", flips);
+
+        updateStats();
+    }
+    else{
+        alert("Du brauchst 10000 Flips!");
+    }
+}
 
 function flipCoin(){
 
-    flips++;
+    flips += multiplier;
 
     if(flips > highscore){
+
         highscore = flips;
-        localStorage.setItem("highscore", highscore);
+
+        localStorage.setItem(
+            "highscore",
+            highscore
+        );
     }
 
-    localStorage.setItem("flips", flips);
+    localStorage.setItem(
+        "flips",
+        flips
+    );
 
     updateCoin();
     updateStats();
 
-    const coin = document.getElementById("coin");
+    const coin =
+    document.getElementById("coin");
 
     coin.classList.remove("flip");
+
     void coin.offsetWidth;
+
     coin.classList.add("flip");
 
     const result =
-        Math.random() < 0.5 ? "Kopf" : "Zahl";
+    Math.random() < 0.5
+    ? "Kopf"
+    : "Zahl";
 
     setTimeout(() => {
+
         document.getElementById("result").textContent =
-            "Ergebnis: " + result;
-    }, 400);
+        "Ergebnis: " + result;
+
+    },400);
 }
+
+updateCoin();
+updateStats();
 
 </script>
 
