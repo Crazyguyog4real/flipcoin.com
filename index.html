@@ -3,16 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Flipcoin Deluxe V2</title>
+<title>Flipcoin Deluxe V3</title>
 
 <style>
 
 body{
-    font-family:Arial,sans-serif;
-    background:#f5f5f5;
-    text-align:center;
     margin:0;
     padding:20px;
+    font-family:Arial,sans-serif;
+    background:#f4f4f4;
+    text-align:center;
 }
 
 h1{
@@ -40,11 +40,18 @@ button{
     color:white;
 }
 
+#flipBtn{
+    background:#f0c040;
+    color:white;
+    font-size:20px;
+    padding:15px 25px;
+}
+
 #coin{
     font-size:120px;
-    margin:20px;
-    transition:0.3s;
+    margin:30px;
     display:inline-block;
+    transition:.3s;
 }
 
 .flip{
@@ -68,11 +75,18 @@ button{
     font-weight:bold;
 }
 
-#flipBtn{
-    background:#f0c040;
-    color:white;
-    font-size:20px;
-    padding:15px 25px;
+#bonusBanner{
+    display:none;
+    position:fixed;
+    top:10px;
+    left:50%;
+    transform:translateX(-50%);
+    background:gold;
+    color:black;
+    padding:12px 20px;
+    border-radius:12px;
+    font-weight:bold;
+    z-index:9999;
 }
 
 #shopButton{
@@ -166,7 +180,9 @@ button{
 </head>
 <body>
 
-<h1>🪙 Flipcoin Deluxe V2</h1>
+<div id="bonusBanner"></div>
+
+<h1>🪙 Flipcoin Deluxe V3</h1>
 
 <input id="username" placeholder="Benutzername">
 <button id="saveBtn" onclick="saveName()">
@@ -200,73 +216,57 @@ onclick="toggleShop()">
 ✖
 </button>
 
-<h2 class="shopTitle">
-Shop
-</h2>
+<h2 class="shopTitle">Shop</h2>
 
-<h3 class="category">
-Multiplikatoren
-</h3>
+<h3 class="category">Multiplikatoren</h3>
 
-<button
-id="buyX2"
+<button id="buyX2"
 class="buyBtn"
 onclick="buyX2()">
 ⚡ x2 (1000)
 </button>
 
-<button
-id="buyX5"
+<button id="buyX5"
 class="buyBtn"
 onclick="buyX5()">
 🚀 x5 (10000)
 </button>
 
-<h3 class="category">
-Effekte
-</h3>
+<h3 class="category">Effekte</h3>
 
-<button
-id="buyFire"
+<button id="buyFire"
 class="buyBtn"
 onclick="buyEffect('Feuer',500)">
 🔥 Feuer (500)
 </button>
 
-<button
-id="buyBlitz"
+<button id="buyBlitz"
 class="buyBtn"
 onclick="buyEffect('Blitz',2000)">
 ⚡ Blitz (2000)
 </button>
 
-<button
-id="buyRainbow"
+<button id="buyRainbow"
 class="buyBtn"
 onclick="buyEffect('Regenbogen',5000)">
 🌈 Regenbogen (5000)
 </button>
 
-<h3 class="category">
-Sounds
-</h3>
+<h3 class="category">Sounds</h3>
 
-<button
-id="buyCoinSound"
+<button id="buyCoinSound"
 class="buyBtn"
 onclick="buySound('Münze',250)">
 🪙 Münzsound (250)
 </button>
 
-<button
-id="buyBell"
+<button id="buyBell"
 class="buyBtn"
 onclick="buySound('Glocke',1000)">
 🔔 Glocke (1000)
 </button>
 
-<button
-id="buyParty"
+<button id="buyParty"
 class="buyBtn"
 onclick="buySound('Party',5000)">
 🎉 Party (5000)
@@ -279,33 +279,32 @@ onclick="buySound('Party',5000)">
 <b>Aktiv</b><br>
 
 Multiplikator:
-<span id="activeMultiplier">
-x1
-</span>
+<span id="activeMultiplier">x1</span>
 
 <br>
 
 Effekt:
-<span id="activeEffect">
-Keiner
-</span>
+<span id="activeEffect">Keiner</span>
 
 <br>
 
 Sound:
-<span id="activeSound">
-Keiner
-</span>
+<span id="activeSound">Keiner</span>
 
 </div>
 
 <script>
-    let flips = parseInt(localStorage.getItem("flips")) || 0;
-let highscore = parseInt(localStorage.getItem("highscore")) || 0;
+  let flips =
+parseInt(localStorage.getItem("flips")) || 0;
 
-let username = localStorage.getItem("username") || "";
+let highscore =
+parseInt(localStorage.getItem("highscore")) || 0;
 
-let multiplier = parseInt(localStorage.getItem("multiplier")) || 1;
+let username =
+localStorage.getItem("username") || "";
+
+let multiplier =
+parseInt(localStorage.getItem("multiplier")) || 1;
 
 let activeEffect =
 localStorage.getItem("activeEffect") || "Keiner";
@@ -319,10 +318,19 @@ localStorage.getItem("boughtX2") === "true";
 let boughtX5 =
 localStorage.getItem("boughtX5") === "true";
 
-document.getElementById("username").value = username;
+let boughtEffects =
+JSON.parse(localStorage.getItem("boughtEffects")) || {};
+
+let boughtSounds =
+JSON.parse(localStorage.getItem("boughtSounds")) || {};
+
+document.getElementById("username").value =
+username;
 
 if(username){
-    document.getElementById("welcome").textContent =
+
+    document.getElementById("welcome")
+    .textContent =
     "Willkommen " + username + "!";
 }
 
@@ -351,29 +359,13 @@ function toggleShop(){
     .classList.toggle("open");
 }
 
-function updateStats(){
+function saveAll(){
 
-    document.getElementById("counter")
-    .textContent =
-    "Flips: " + flips;
-
-    document.getElementById("highscore")
-    .textContent =
-    "Highscore: " + highscore;
-
-    document.getElementById("activeMultiplier")
-    .textContent =
-    "x" + multiplier;
-
-    document.getElementById("activeEffect")
-    .textContent =
-    activeEffect;
-
-    document.getElementById("activeSound")
-    .textContent =
-    activeSound;
-
-    updateCoin();
+    localStorage.setItem("flips", flips);
+    localStorage.setItem("highscore", highscore);
+    localStorage.setItem("multiplier", multiplier);
+    localStorage.setItem("activeEffect", activeEffect);
+    localStorage.setItem("activeSound", activeSound);
 }
 
 function updateCoin(){
@@ -412,34 +404,169 @@ function updateCoin(){
     }
 }
 
-function saveAll(){
+function updateStats(){
 
-    localStorage.setItem(
-    "flips",
-    flips
-    );
+    document.getElementById("counter")
+    .textContent =
+    "Flips: " + flips;
 
-    localStorage.setItem(
-    "highscore",
-    highscore
-    );
+    document.getElementById("highscore")
+    .textContent =
+    "Highscore: " + highscore;
 
-    localStorage.setItem(
-    "multiplier",
-    multiplier
-    );
+    document.getElementById("activeMultiplier")
+    .textContent =
+    "x" + multiplier;
 
-    localStorage.setItem(
-    "activeEffect",
-    activeEffect
-    );
+    document.getElementById("activeEffect")
+    .textContent =
+    activeEffect;
 
-    localStorage.setItem(
-    "activeSound",
-    activeSound
-    );
+    document.getElementById("activeSound")
+    .textContent =
+    activeSound;
+
+    updateCoin();
 }
-    function playSound(){
+
+function markBoughtButtons(){
+
+    if(boughtX2){
+
+        document.getElementById("buyX2")
+        .disabled = true;
+
+        document.getElementById("buyX2")
+        .textContent =
+        "⚡ x2 ✓";
+    }
+
+    if(boughtX5){
+
+        document.getElementById("buyX5")
+        .disabled = true;
+
+        document.getElementById("buyX5")
+        .textContent =
+        "🚀 x5 ✓";
+    }
+
+    if(boughtEffects.Feuer){
+
+        document.getElementById("buyFire")
+        .disabled = true;
+
+        document.getElementById("buyFire")
+        .textContent =
+        "🔥 Feuer ✓";
+    }
+
+    if(boughtEffects.Blitz){
+
+        document.getElementById("buyBlitz")
+        .disabled = true;
+
+        document.getElementById("buyBlitz")
+        .textContent =
+        "⚡ Blitz ✓";
+    }
+
+    if(boughtEffects.Regenbogen){
+
+        document.getElementById("buyRainbow")
+        .disabled = true;
+
+        document.getElementById("buyRainbow")
+        .textContent =
+        "🌈 Regenbogen ✓";
+    }
+
+    if(boughtSounds.Münze){
+
+        document.getElementById("buyCoinSound")
+        .disabled = true;
+
+        document.getElementById("buyCoinSound")
+        .textContent =
+        "🪙 Münzsound ✓";
+    }
+
+    if(boughtSounds.Glocke){
+
+        document.getElementById("buyBell")
+        .disabled = true;
+
+        document.getElementById("buyBell")
+        .textContent =
+        "🔔 Glocke ✓";
+    }
+
+    if(boughtSounds.Party){
+
+        document.getElementById("buyParty")
+        .disabled = true;
+
+        document.getElementById("buyParty")
+        .textContent =
+        "🎉 Party ✓";
+    }
+}  
+    // ===== BONUS EVENT =====
+
+let bonusActive = false;
+let bonusTimeLeft = 0;
+
+function startBonus(){
+
+    if(bonusActive){
+        return;
+    }
+
+    bonusActive = true;
+    bonusTimeLeft = 150;
+
+    const banner =
+    document.getElementById("bonusBanner");
+
+    banner.style.display = "block";
+
+    const countdown = setInterval(() => {
+
+        const minutes =
+        Math.floor(bonusTimeLeft / 60);
+
+        const seconds =
+        bonusTimeLeft % 60;
+
+        banner.innerHTML =
+        "🌟 BONUS x5 AKTIV 🌟<br>" +
+        minutes + ":" +
+        String(seconds).padStart(2,"0");
+
+        bonusTimeLeft--;
+
+        if(bonusTimeLeft < 0){
+
+            clearInterval(countdown);
+
+            bonusActive = false;
+
+            banner.style.display = "none";
+        }
+
+    },1000);
+}
+
+// alle 5 Minuten starten
+setInterval(() => {
+    startBonus();
+},300000);
+
+function playSound(){
+
+    if(activeSound === "Keiner"){
+        return;
+    }
 
     const audio =
     new (window.AudioContext ||
@@ -460,11 +587,8 @@ function saveAll(){
     else if(activeSound === "Glocke"){
         osc.frequency.value = 700;
     }
-    else if(activeSound === "Party"){
-        osc.frequency.value = 1000;
-    }
     else{
-        return;
+        osc.frequency.value = 1000;
     }
 
     osc.start();
@@ -481,7 +605,13 @@ function saveAll(){
 
 function flipCoin(){
 
-    flips += multiplier;
+    let gainValue = multiplier;
+
+    if(bonusActive){
+        gainValue *= 5;
+    }
+
+    flips += gainValue;
 
     if(flips > highscore){
         highscore = flips;
@@ -513,13 +643,12 @@ function flipCoin(){
         .textContent =
         "Ergebnis: " + result;
 
-    }, 400);
+    },400);
 }
 
 function buyX2(){
 
     if(boughtX2){
-        alert("Bereits gekauft!");
         return;
     }
 
@@ -539,18 +668,14 @@ function buyX2(){
     true
     );
 
-    document.getElementById("buyX2")
-    .disabled = true;
-
     saveAll();
-
     updateStats();
+    markBoughtButtons();
 }
 
 function buyX5(){
 
     if(boughtX5){
-        alert("Bereits gekauft!");
         return;
     }
 
@@ -570,116 +695,14 @@ function buyX5(){
     true
     );
 
-    document.getElementById("buyX5")
-    .disabled = true;
-
     saveAll();
-
     updateStats();
-}
-
-function buyEffect(name,cost){
-
-    if(flips < cost){
-        alert("Nicht genug Flips!");
-        return;
-    }
-
-    flips -= cost;
-
-    activeEffect = name;
-
-    saveAll();
-
-    updateStats();
-}
-
-function buySound(name,cost){
-
-    if(flips < cost){
-        alert("Nicht genug Flips!");
-        return;
-    }
-
-    flips -= cost;
-
-    activeSound = name;
-
-    saveAll();
-
-    updateStats();
-}
-
-if(boughtX2){
-
-    document.getElementById("buyX2")
-    .disabled = true;
-}
-
-if(boughtX5){
-
-    document.getElementById("buyX5")
-    .disabled = true;
-}
-
-updateStats();
-// --- Teil 4 ---
-
-let boughtEffects =
-JSON.parse(localStorage.getItem("boughtEffects")) || {};
-
-let boughtSounds =
-JSON.parse(localStorage.getItem("boughtSounds")) || {};
-
-function markBoughtButtons(){
-
-    if(boughtEffects.Feuer){
-        document.getElementById("buyFire")
-        .textContent = "🔥 Feuer ✓";
-        document.getElementById("buyFire")
-        .disabled = true;
-    }
-
-    if(boughtEffects.Blitz){
-        document.getElementById("buyBlitz")
-        .textContent = "⚡ Blitz ✓";
-        document.getElementById("buyBlitz")
-        .disabled = true;
-    }
-
-    if(boughtEffects.Regenbogen){
-        document.getElementById("buyRainbow")
-        .textContent = "🌈 Regenbogen ✓";
-        document.getElementById("buyRainbow")
-        .disabled = true;
-    }
-
-    if(boughtSounds.Münze){
-        document.getElementById("buyCoinSound")
-        .textContent = "🪙 Münzsound ✓";
-        document.getElementById("buyCoinSound")
-        .disabled = true;
-    }
-
-    if(boughtSounds.Glocke){
-        document.getElementById("buyBell")
-        .textContent = "🔔 Glocke ✓";
-        document.getElementById("buyBell")
-        .disabled = true;
-    }
-
-    if(boughtSounds.Party){
-        document.getElementById("buyParty")
-        .textContent = "🎉 Party ✓";
-        document.getElementById("buyParty")
-        .disabled = true;
-    }
+    markBoughtButtons();
 }
 
 function buyEffect(name,cost){
 
     if(boughtEffects[name]){
-        alert("Bereits gekauft!");
         return;
     }
 
@@ -707,7 +730,6 @@ function buyEffect(name,cost){
 function buySound(name,cost){
 
     if(boughtSounds[name]){
-        alert("Bereits gekauft!");
         return;
     }
 
@@ -732,7 +754,9 @@ function buySound(name,cost){
     markBoughtButtons();
 }
 
+updateStats();
 markBoughtButtons();
+
 </script>
 </body>
 </html>
